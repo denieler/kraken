@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import logo from './images/kraken_logo.png'
-import './App.css'
 
 import List from './list'
 import Upload from './upload'
@@ -14,7 +13,7 @@ class App extends Component {
           <React.Fragment>
             <header className='header'>
               <img src={logo} className='header__logo' alt='Kraken' />
-              <div class='header__nav nav'>
+              <div className='header__nav nav'>
                 <Link to='/' className='nav__link'>List documents</Link>
                 <Link to='/upload' className='nav__link'>Upload</Link>
               </div>

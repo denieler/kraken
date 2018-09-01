@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: 'Proxima-Nova Light',Helvetica,Arial,sans-serif;
 }
 
 @font-face {
@@ -11,6 +11,7 @@ body {
 
 a {
   text-decoration: none;
+  color: #2499d2;
 }
 
 .header {
@@ -40,4 +41,8 @@ a {
   text-align: center;
   text-transform: uppercase;
   margin: 0 15px;
+}
+
+.container {
+  padding: 0 20px;
 }

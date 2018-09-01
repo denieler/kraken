@@ -1,0 +1,34 @@
+.files-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.file {
+    width: 250px;
+    height: 100px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    border: 1px solid lightgrey;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+
+    padding: 20px;
+    margin: 10px;
+}
+
+.file:first-of-type {
+    margin-left: 0;
+}
+
+.file__name {
+    font-size: 1.5rem;
+}
+
+.file__icon {
+    width: 16px;
+    height: 16px;
+}

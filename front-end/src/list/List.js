@@ -3,13 +3,17 @@ import { connect } from 'react-redux'
 import { loadFiles } from './list.actions'
 import Loader from '../app/components/loader'
 import FilesList from '../app/components/files-list'
-import { getIsLoading } from './list.selectors'
+import { getIsLoading, getFiles } from './list.selectors'
 import './list.css'
 
 class List extends Component {
   componentDidMount () {
     const { loadFiles } = this.props
     loadFiles()
+  }
+
+  handleDeleteFile (fileId) {
+    console.log('Delete file: ', fileId)
   }
 
   render () {
@@ -22,8 +26,8 @@ class List extends Component {
         <div className='list__content'>
         {
           isLoading
-          ? <Loader />
-          : <FilesList files={files} />
+            ? <Loader />
+            : <FilesList files={files} onDelete={this.handleDeleteFile} />
         }
         </div>
       </div>
@@ -33,7 +37,8 @@ class List extends Component {
 
 const mapStateToProps = state => {
   return {
-    isLoading: getIsLoading(state)
+    isLoading: getIsLoading(state),
+    files: getFiles(state)
   }
 }
 

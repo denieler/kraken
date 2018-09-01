@@ -50,8 +50,10 @@ export const getFiles = () => {
     return new Promise(resolve => {
         setTimeout(_ => {
             resolve([{
+                    id: 1,
                     name: 'filename.jpg'
                 }, {
+                    id: 2,
                     name: 'filename2.jpg'
                 }
             ])

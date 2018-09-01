@@ -1,24 +1,34 @@
-import React, { Component } from 'react';
-import logo from './images/kraken_logo.png';
-import './App.css';
+import React, { Component } from 'react'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import logo from './images/kraken_logo.png'
+import './App.css'
+
+import List from './list'
+import Upload from './upload'
 
 class App extends Component {
   render() {
     return (
-      <div className='App'>
-        <header className='header'>
-          <img src={logo} className='header__logo' alt='Kraken' />
-          <div class='header__nav nav'>
-            <a href='/' className='nav__link'>List documents</a>
-            <a href='/' className='nav__link'>Upload</a>
-          </div>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div className='app'>
+        <Router>
+          <React.Fragment>
+            <header className='header'>
+              <img src={logo} className='header__logo' alt='Kraken' />
+              <div class='header__nav nav'>
+                <Link to='/' className='nav__link'>List documents</Link>
+                <Link to='/upload' className='nav__link'>Upload</Link>
+              </div>
+            </header>
+
+            <div className='container'>
+              <Route exact path='/' component={List} />
+              <Route exact path='/upload' component={Upload} />
+            </div>
+          </React.Fragment>
+        </Router>
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default App

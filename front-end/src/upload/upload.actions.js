@@ -14,6 +14,23 @@ const changeFileUploadProgress = progress => ({
     payload: { progress }
 })
 
+const pickFile = file => (dispatch, getState) => {
+    dispatch(changeFileUploadProgress(0))
+
+    return uploadFile(file, {
+        onProgress: (progress) => dispatch(changeFileUploadProgress(progress))
+    })
+    .then(({src}) => {
+        // do something with the `src`
+    })
+    .catch((err, {aborted} = {}) => {
+        if (aborted) return
+
+        console.error(err)
+        dispatch(showAlertNotification('File upload failed'))
+    })
+}
+
 export const pickContentFromFile = file => dispatch => {
     if (!isSupportedImageType(file)) {
         return dispatch(showAlertNotification('Invalid file type'))
@@ -34,21 +51,4 @@ export const pickContentFromFile = file => dispatch => {
             dispatch(pickFile(fileObject))
         }
     )
-}
-
-const pickFile = file => (dispatch, getState) => {
-    dispatch(changeFileUploadProgress(0))
-
-    return uploadFile(file, {
-        onProgress: (progress) => dispatch(changeFileUploadProgress(progress))
-    })
-    .then(({src}) => {
-        // do something with the `src`
-    })
-    .catch((err, {aborted} = {}) => {
-        if (aborted) return
-
-        console.error(err)
-        dispatch(showAlertNotification('File upload failed'))
-    })
 }

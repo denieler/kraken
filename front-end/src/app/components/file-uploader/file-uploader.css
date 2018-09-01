@@ -1,0 +1,22 @@
+.file-uploader {
+    height: 250px;
+    background-color: #f1f1f1;
+
+    border-radius: 5px;
+    border-style: dashed;
+    border-color: lightgrey;
+    border-width: 1px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.file-uploader__message {
+    text-align: center;
+}
+
+.file-uploader__error {
+    text-align: center;
+    color: red;
+}

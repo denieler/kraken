@@ -45,3 +45,24 @@ export function uploadFile (file, callbacks) {
         xhr.send(JSON.stringify(body))
     })
 }
+
+export const getFiles = () => {
+    return new Promise(resolve => {
+        setTimeout(_ => {
+            resolve([{
+                    name: 'filename.jpg'
+                }, {
+                    name: 'filename2.jpg'
+                }
+            ])
+        }, 1000)
+    })
+}
+
+export const deleteFile = id => {
+    return new Promise(resolve => {
+        setTimeout(_ => {
+            resolve()
+        }, 1000)
+    })
+}

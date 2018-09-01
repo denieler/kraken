@@ -1,0 +1,7 @@
+.list__content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+}

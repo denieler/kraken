@@ -4,13 +4,14 @@ import {
 } from '../app/lib/file-validation'
 import { imageToBase64 } from '../app/lib/image-to-base64'
 import { uploadFile } from '../app/transport'
+import { SHOW_ALERT_NOTIFICATION, CHANGE_FILE_UPLOAD_PROGRESS } from './upload.reducers'
 
 const showAlertNotification = message => ({
-    type: 'SHOW_ALERT_NOTIFICATION',
+    type: SHOW_ALERT_NOTIFICATION,
     payload: { message }
 })
 const changeFileUploadProgress = progress => ({
-    type: 'CHANGE_FILE_UPLOAD_PROGRESS',
+    type: CHANGE_FILE_UPLOAD_PROGRESS,
     payload: { progress }
 })
 

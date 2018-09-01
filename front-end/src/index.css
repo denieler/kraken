@@ -3,3 +3,41 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+@font-face {
+  font-family: 'Proxima-Nova Light';
+  src: url('/assets/fonts/proxima-nova-thin.woff') format('woff')
+}
+
+a {
+  text-decoration: none;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.header__logo {
+  width: 220px;
+  height: 25px;
+}
+
+.nav__link {
+  color: #000;
+  display: inline-block;
+  font-family: 'Proxima-Nova Light',Proxima-Nova;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  line-height: 20px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0 15px;
+}

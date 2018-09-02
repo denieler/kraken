@@ -12,6 +12,7 @@
         "symfony/asset": "*",
         "symfony/console": "*",
         "symfony/expression-language": "*",
+        "symfony/filesystem": "*",
         "symfony/finder": "*",
         "symfony/flex": "^1.1",
         "symfony/form": "*",

@@ -9,10 +9,38 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Filesystem\Filesystem;
 
 class FilesController extends AbstractController
 {
     private const UPLOAD_DIR = '/var/tmp/kraken_files';
+    private const SUPPORTED_FILE_SIZE = 1000000;
+    private const SUPPORTED_FILE_TYPE = [
+        'image/jpeg',
+        'image/png',
+        'image/gif'
+    ];
+
+    private function isSupportedFileType(string $mimeType)
+    {
+        return in_array($mimeType, self::SUPPORTED_FILE_TYPE);
+    }
+
+    private function isSupportedFileSize(string $size)
+    {
+        return $size <= self::SUPPORTED_FILE_SIZE;
+    }
+
+    private function getFileSize(string $fileContent) {
+        return strlen($fileContent);
+    }
+
+    private function getFileMimeType(string $fileContent)
+    {
+        $f = finfo_open();
+        $mime_type = finfo_buffer($f, $fileContent, FILEINFO_MIME_TYPE);
+        return $mime_type;
+    }
 
     /**
     * @Post("/files", name="_files")
@@ -58,6 +86,11 @@ class FilesController extends AbstractController
         
         try {
             $fileContent = base64_decode($file);
+
+            $mime_type = $this->getFileMimeType($fileContent);
+            $this->isSupportedFileType($mime_type);
+            $size = $this->getFileSize($fileContent);
+            $this->isSupportedFileSize($size);
 
             file_put_contents(
                 self::UPLOAD_DIR . $fileUploadFilename,
@@ -122,6 +155,9 @@ class FilesController extends AbstractController
 
         $fileEntity->setDeleted(true);
         $entityManager->flush();
+
+        $fileSystem = new Filesystem();
+        $fileSystem->remove(self::UPLOAD_DIR . $fileEntity->getPath());
 
         return new JsonResponse(
             [

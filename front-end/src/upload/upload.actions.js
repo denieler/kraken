@@ -23,6 +23,9 @@ const pickFile = file => (dispatch, getState) => {
     })
     .then(({src}) => {
         // do something with the `src`
+        setTimeout(() => {
+            dispatch(changeFileUploadProgress(null))
+        }, 1000)
     })
     .catch((err, {aborted} = {}) => {
         if (aborted) return
@@ -33,6 +36,9 @@ const pickFile = file => (dispatch, getState) => {
 }
 
 export const pickContentFromFile = file => dispatch => {
+    dispatch(showAlertNotification(null))
+    dispatch(changeFileUploadProgress(null))
+
     if (!isSupportedImageType(file)) {
         return dispatch(showAlertNotification('Invalid file type'))
     }

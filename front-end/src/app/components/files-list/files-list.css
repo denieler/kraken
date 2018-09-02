@@ -28,6 +28,10 @@
 
 .file__name {
     font-size: 1.5rem;
+
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
 }
 
 .file__icon {

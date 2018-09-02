@@ -1,5 +1,6 @@
 import React from 'react'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
+import Spacer from '../spacer'
 import cross from '../../../images/cross.png'
 import './files-list.css'
 
@@ -14,12 +15,14 @@ const FilesList = ({ files, onDelete }) => {
     {
         files.map(file =>
             <CSSTransition key={file.id} timeout={300} classNames='file-disappear'>
-                <div className='file'>
-                    <div className='file__name'>{file.name}</div>
-                    <a href='#' onClick={onDelete.bind(this, file.id)}>
-                        <img src={cross} className='file__icon' alt='Delete' />
-                    </a>
-                </div>
+                <Spacer right={1} bottom={1}>
+                    <div className='file'>
+                        <div className='file__name'>{file.name}</div>
+                        <a href='#' onClick={onDelete.bind(this, file.id)}>
+                            <img src={cross} className='file__icon' alt='Delete' />
+                        </a>
+                    </div>
+                </Spacer>
             </CSSTransition>
         )
     }

@@ -19,7 +19,7 @@ const pickFile = file => (dispatch, getState) => {
     dispatch(changeFileUploadProgress(0))
 
     return uploadFile(file, {
-        onProgress: (progress) => dispatch(changeFileUploadProgress(progress))
+        onProgress: progress => dispatch(changeFileUploadProgress(progress))
     })
     .then(() => {
         setTimeout(() => {
@@ -34,7 +34,7 @@ const pickFile = file => (dispatch, getState) => {
     })
 }
 
-export const pickContentFromFile = file => dispatch => {
+export const pickContentFromFile = file => async (dispatch) => {
     dispatch(showAlertNotification(null))
     dispatch(changeFileUploadProgress(null))
 
@@ -47,13 +47,10 @@ export const pickContentFromFile = file => dispatch => {
   
     const { name, type } = file
   
-    return imageToBase64(file)
-        .then(hash => {
-            const fileObject = {
-                content: hash,
-                name
-            }
-            dispatch(pickFile(fileObject))
-        }
-    )
+    const hash = await imageToBase64(file)
+    const fileObject = {
+        content: hash,
+        name
+    }
+    dispatch(pickFile(fileObject))
 }

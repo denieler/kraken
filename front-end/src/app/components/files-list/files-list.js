@@ -3,8 +3,14 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import cross from '../../../images/cross.png'
 import './files-list.css'
 
-const FilesList = ({ files, onDelete }) =>
-    <TransitionGroup className='files-list'>
+const FilesList = ({ files, onDelete }) => {
+    if (!files || !files.length) {
+        return <div className='files-list files-list--centered'>
+            There are no uploaded files yet. Try how it works :)
+        </div>
+    }
+
+    return <TransitionGroup className='files-list'>
     {
         files.map(file =>
             <CSSTransition key={file.id} timeout={300} classNames='file-disappear'>
@@ -18,5 +24,6 @@ const FilesList = ({ files, onDelete }) =>
         )
     }
     </TransitionGroup>
+}
 
 export default FilesList

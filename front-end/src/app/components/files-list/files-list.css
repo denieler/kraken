@@ -5,6 +5,10 @@
     width: 100%;
 }
 
+.files-list--centered {
+    justify-content: center;
+}
+
 .file {
     width: 250px;
     height: 100px;

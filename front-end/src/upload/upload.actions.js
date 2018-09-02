@@ -5,56 +5,56 @@ import {
 import { imageToBase64 } from '../app/lib/image-to-base64'
 import { uploadFile } from '../app/transport'
 import {
-    SHOW_ALERT_NOTIFICATION,
-    CHANGE_FILE_UPLOAD_PROGRESS,
-    FINISH_UPLOAD_PROCESS,
-    RESET_UPLOAD_PROCESS
+    ALERT_NOTIFICATION_SET,
+    UPLOAD_PROGRESS_SET,
+    UPLOAD_STATUS_FINISH,
+    UPLOAD_STATUS_RESET
 } from './upload.reducers'
 
-const showAlertNotification = message => ({
-    type: SHOW_ALERT_NOTIFICATION,
+const alertNotificationSet = message => ({
+    type: ALERT_NOTIFICATION_SET,
     payload: { message }
 })
-const changeFileUploadProgress = progress => ({
-    type: CHANGE_FILE_UPLOAD_PROGRESS,
+const uploadProgressSet = progress => ({
+    type: UPLOAD_PROGRESS_SET,
     payload: { progress }
 })
-const finishUploadProcess = () => ({
-    type: FINISH_UPLOAD_PROCESS
+const uploadStatusFinish = () => ({
+    type: UPLOAD_STATUS_FINISH
 })
-export const resetUploadProcess = () => ({
-    type: RESET_UPLOAD_PROCESS
+export const uploadStatusReset = () => ({
+    type: UPLOAD_STATUS_RESET
 })
 
 const pickFile = file => (dispatch, getState) => {
-    dispatch(changeFileUploadProgress(0))
+    dispatch(uploadProgressSet(0))
 
     return uploadFile(file, {
-        onProgress: progress => dispatch(changeFileUploadProgress(progress))
+        onProgress: progress => dispatch(uploadProgressSet(progress))
     })
     .then(() => {
         setTimeout(() => {
-            dispatch(changeFileUploadProgress(null))
-            dispatch(finishUploadProcess())
+            dispatch(uploadProgressSet(null))
+            dispatch(uploadStatusFinish())
         }, 1000)
     })
     .catch((err, {aborted} = {}) => {
         if (aborted) return
 
         console.error(err)
-        dispatch(showAlertNotification('File upload failed'))
+        dispatch(alertNotificationSet('File upload failed'))
     })
 }
 
 export const pickContentFromFile = file => async (dispatch) => {
-    dispatch(showAlertNotification(null))
-    dispatch(changeFileUploadProgress(null))
+    dispatch(alertNotificationSet(null))
+    dispatch(uploadProgressSet(null))
 
     if (!isSupportedImageType(file)) {
-        return dispatch(showAlertNotification('Invalid file type'))
+        return dispatch(alertNotificationSet('Invalid file type'))
     }
     if (!isSupportedImageSize(file)) {
-        return dispatch(showAlertNotification('Invalid file size'))
+        return dispatch(alertNotificationSet('Invalid file size'))
     }
   
     const { name, type } = file

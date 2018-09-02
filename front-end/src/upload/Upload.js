@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
-import { pickContentFromFile, resetUploadProcess } from './upload.actions'
+import { pickContentFromFile, uploadStatusReset } from './upload.actions'
 import FileUploader from '../app/components/file-uploader'
 import { getUploadProgress, getAlertNotification, getIsUploadFinished } from './upload.selectors'
 import './upload.css'
@@ -10,14 +10,14 @@ class Upload extends Component {
   render() {
     const {
       onUploadFile,
-      resetUploadProcess,
+      uploadStatusReset,
       alertNotification,
       progress,
       isUploadFinished
     } = this.props
 
     if (isUploadFinished) {
-      resetUploadProcess()
+      uploadStatusReset()
       return <Redirect to='/' />
     }
 
@@ -43,7 +43,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
   onUploadFile: pickContentFromFile,
-  resetUploadProcess: resetUploadProcess
+  uploadStatusReset: uploadStatusReset
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Upload)

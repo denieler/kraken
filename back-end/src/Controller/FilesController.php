@@ -47,7 +47,7 @@ class FilesController extends AbstractController
     */
     public function uploadAction(Request $request)
     {
-        $file = $request->get('file');
+        $content = $request->get('content');
         $filename = $request->get('name');
 
         $fileInfo = new \SplFileInfo($filename);
@@ -85,7 +85,7 @@ class FilesController extends AbstractController
         $fileId = $fileEntity->getId();
         
         try {
-            $fileContent = base64_decode($file);
+            $fileContent = base64_decode($content);
 
             $mime_type = $this->getFileMimeType($fileContent);
             $this->isSupportedFileType($mime_type);

@@ -82,7 +82,7 @@ class FilesController extends AbstractController
         $fileId = $fileEntity->getId();
 
         try {
-            $this->fileUploadService->uploadFileContent($uploadingFileName, $fileContentBase64);
+            $this->fileUploadService->uploadFile($uploadingFileName, $fileContentBase64);
         } catch (WrongFileTypeException $e) {
             return new JsonResponse([
                 'errors' => [

@@ -29,7 +29,7 @@ class FileUploadService
         return $mime_type;
     }
 
-    public function uploadFileContent(string $fileName, string $contentBase64)
+    public function uploadFile(string $fileName, string $contentBase64)
     {
         $fileContent = base64_decode($contentBase64);
 

@@ -60,12 +60,12 @@ class FilesController extends AbstractController
         if ($fileEntityExisting)
         {
             return new JsonResponse([
-                    'errors' => [
-                        [
-                            'code' => 'DUPLICATE_FILE',
-                            'title' => 'File you trying to upload already exists on server'
-                        ]
+                'errors' => [
+                    [
+                        'code' => 'DUPLICATE_FILE',
+                        'title' => 'File you trying to upload already exists on server'
                     ]
+                ]
             ], 500);
         }
 
@@ -85,31 +85,30 @@ class FilesController extends AbstractController
             $this->fileUploadService->uploadFileContent($uploadingFileName, $fileContentBase64);
         } catch (WrongFileTypeException $e) {
             return new JsonResponse([
-                    'errors' => [
-                        [
-                            'code' => 'SERVER_CAN_NOT_PROCESS_FILE_TYPE',
-                            'title' => 'Server can not upload this type of files'
-                        ]
+                'errors' => [
+                    [
+                        'code' => 'SERVER_CAN_NOT_PROCESS_FILE_TYPE',
+                        'title' => 'Server can not upload this type of files'
                     ]
+                ]
             ], 500);
         } catch (WrongFileSizeException $e) {
-            return new JsonResponse(
-                [
-                    'errors' => [
-                        [
-                            'code' => 'SERVER_CAN_NOT_PROCESS_FILE_SIZE',
-                            'title' => 'File size is way too big. Please upload another file'
-                        ]
+            return new JsonResponse([
+                'errors' => [
+                    [
+                        'code' => 'SERVER_CAN_NOT_PROCESS_FILE_SIZE',
+                        'title' => 'File size is way too big. Please upload another file'
                     ]
+                ]
             ], 500);
         } catch (\Throwable $e) {
             return new JsonResponse([
-                    'errors' => [
-                        [
-                            'code' => 'SERVER_CAN_NOT_PROCESS_FILE',
-                            'title' => 'Server can not upload this file'
-                        ]
+                'errors' => [
+                    [
+                        'code' => 'SERVER_CAN_NOT_PROCESS_FILE',
+                        'title' => 'Server can not upload this file'
                     ]
+                ]
             ], 500);
         }
 
@@ -129,6 +128,8 @@ class FilesController extends AbstractController
     public function listAction()
     {
         $fileRepository = $this->getDoctrine()->getRepository(File::class);
+        // if we would have userId there we should find all not deleted
+        // for userId obviously
         $files = $fileRepository->findAllNotDeleted();
 
         $result = array_map(function ($file) {

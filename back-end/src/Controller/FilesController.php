@@ -51,13 +51,11 @@ class FilesController extends AbstractController
             ], 500);
         }
 
-        $entityManager->persist($fileEntity);
-        $entityManager->flush();
-
-        $fileId = $fileEntity->getId();
-
         try {
             $this->fileUploadService->uploadFile($fileEntity->getPath(), $fileContentBase64);
+
+            $entityManager->persist($fileEntity);
+            $entityManager->flush();
         } catch (WrongFileTypeException $e) {
             return new JsonResponse([
                 'errors' => [
@@ -87,6 +85,7 @@ class FilesController extends AbstractController
             ], 500);
         }
 
+        $fileId = $fileEntity->getId();
         return new JsonResponse(
             [
                 'data' => [ 
@@ -132,11 +131,11 @@ class FilesController extends AbstractController
             return new JsonResponse([ 'data' => null ], 404);    
         }
 
-        $fileEntity->setDeleted(true);
-        $entityManager->flush();
-
         try {
             $this->fileUploadService->removeFile($fileEntity->getPath());
+
+            $fileEntity->setDeleted(true);
+            $entityManager->flush();
         } catch (\Throwable $e) {
             return new JsonResponse([
                 'errors' => [

@@ -27,6 +27,11 @@ class File
     private $hash;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $salt;
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $path;
@@ -42,25 +47,32 @@ class File
         return $fileInfo->getExtension();
     }
 
-    private static function getHashName(string $fileName)
+    private static function generateSalt()
     {
-        return md5($fileName);
+        return random_bytes(16);
     }
 
-    private static function generateRandomFileName(string $fileName)
+    private static function getHashName(string $fileName, string $salt)
     {
-        $hash = File::getHashName($fileName);
+        return md5($fileName . $salt);
+    }
+
+    private static function generateRandomFileName(string $fileName, string $salt)
+    {
+        $hash = File::getHashName($fileName, $salt);
         return $hash . '.' . File::getFileExtension($fileName);
     }
 
     public static function createFromUploadFile(string $fileName): self
     {
-        $uploadingFileHash = File::getHashName($fileName);
-        $uploadingFileName = '/' . File::generateRandomFileName($fileName);
+        $salt = File::generateSalt();
+        $uploadingFileHash = File::getHashName($fileName, $salt);
+        $uploadingFileName = '/' . File::generateRandomFileName($fileName, $salt);
 
         $fileEntity = new File();
         $fileEntity->setName($fileName);
         $fileEntity->setHash($uploadingFileHash);
+        $fileEntity->setSalt($salt);
         $fileEntity->setPath($uploadingFileName);
         // if we would have userId then we would need to also connect file
         // record to the userId
@@ -93,6 +105,18 @@ class File
     public function setHash(string $hash): self
     {
         $this->hash = $hash;
+
+        return $this;
+    }
+
+    public function getSalt(): ?string
+    {
+        return $this->salt;
+    }
+
+    public function setSalt(string $salt): self
+    {
+        $this->salt = $salt;
 
         return $this;
     }

@@ -1,4 +1,4 @@
-import { UPLOAD_URL } from './constants/api'
+import { BASE_API_URL } from './constants/api'
 
 export function uploadFile (file, callbacks) {
     const {
@@ -13,7 +13,7 @@ export function uploadFile (file, callbacks) {
 
         const body = file
 
-        xhr.open('POST', UPLOAD_URL, true)
+        xhr.open('POST', BASE_API_URL + '/files', true)
         xhr.setRequestHeader('Content-Type', 'application/json')
 
         /* onProgress */
@@ -47,24 +47,20 @@ export function uploadFile (file, callbacks) {
 }
 
 export const getFiles = () => {
-    return new Promise(resolve => {
-        setTimeout(_ => {
-            resolve([{
-                    id: 1,
-                    name: 'filename.jpg'
-                }, {
-                    id: 2,
-                    name: 'filename2.jpg'
-                }
-            ])
-        }, 1000)
-    })
+    return fetch(BASE_API_URL + '/files')
+        .then(response => {
+            return response.json()
+        })
+        .then(result => result.data)
 }
 
 export const deleteFile = id => {
-    return new Promise(resolve => {
-        setTimeout(_ => {
-            resolve()
-        }, 1000)
-    })
+    return fetch(
+        BASE_API_URL + '/files/' + id,
+        {
+            method: 'DELETE'
+        })
+        .then(response => {
+            return response.json()
+        })
 }

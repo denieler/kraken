@@ -16,3 +16,7 @@ export const loadFiles = () => async (dispatch) => {
     const files = await api.getFiles()
     dispatch(filesLoaded(files))
 }
+
+export const deleteFile = id => async (dispatch) => {
+    await api.deleteFile(id)
+}

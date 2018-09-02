@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { loadFiles } from './list.actions'
+import { loadFiles, deleteFile } from './list.actions'
 import Loader from '../app/components/loader'
 import FilesList from '../app/components/files-list'
 import { getIsLoading, getFiles } from './list.selectors'
@@ -12,8 +12,9 @@ class List extends Component {
     loadFiles()
   }
 
-  handleDeleteFile (fileId) {
-    console.log('Delete file: ', fileId)
+  handleDeleteFile = (fileId) => {
+    const { deleteFile } = this.props
+    deleteFile(fileId)
   }
 
   render () {
@@ -43,7 +44,8 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-  loadFiles: loadFiles
+  loadFiles: loadFiles,
+  deleteFile: deleteFile
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(List)

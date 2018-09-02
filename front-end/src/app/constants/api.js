@@ -1,1 +1,1 @@
-export const UPLOAD_URL = 'http://localhost'
+export const BASE_API_URL = 'http://localhost:8000'

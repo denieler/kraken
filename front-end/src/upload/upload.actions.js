@@ -46,8 +46,7 @@ export const pickContentFromFile = file => dispatch => {
         .then(hash => {
             const fileObject = {
                 content: hash,
-                media_type: type,
-                file_name: name
+                name
             }
             dispatch(pickFile(fileObject))
         }

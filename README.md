@@ -50,4 +50,5 @@ yarn start
 Inside it has url to API, which is hardcoded to `http://localhost:8000` in `./front-end/src/app/constants/api.js`. So if you will use another port or url, please configure it there.
 
 Open `http://localhost:3000/`
+
 Enjoy!

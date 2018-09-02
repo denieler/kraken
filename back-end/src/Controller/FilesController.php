@@ -27,6 +27,23 @@ class FilesController extends AbstractController
         $fileUploadFilename = '/' . md5($filename) . '.' . $fileInfo->getExtension();
 
         $entityManager = $this->getDoctrine()->getManager();
+        $fileRepository = $entityManager->getRepository(File::class);
+
+        $fileEntityExisting = $fileRepository->findAllByHash($hash);
+        if ($fileEntityExisting) {
+            return new JsonResponse(
+                [
+                    'errors' => [
+                        [
+                            'code' => 'DUPLICATE_FILE',
+                            'title' => 'File you trying to upload already exists on server'
+                        ]
+                    ]
+                ],
+                500
+            );
+        }
+
         $fileEntity = new File();
         $fileEntity->setName($filename);
         $fileEntity->setHash($hash);

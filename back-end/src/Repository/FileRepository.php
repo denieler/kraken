@@ -31,15 +31,17 @@ class FileRepository extends ServiceEntityRepository
         ;
     }
 
-    /*
-    public function findOneBySomeField($value): ?File
+    /**
+     * @return File[] Returns an array of File objects
+     */
+    public function findAllByHash($hash)
     {
         return $this->createQueryBuilder('f')
-            ->andWhere('f.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('f.hash = :hash')
+            ->andWhere('f.deleted IS NULL')
+            ->setParameter('hash', $hash)
             ->getQuery()
-            ->getOneOrNullResult()
+            ->getResult()
         ;
     }
-    */
 }

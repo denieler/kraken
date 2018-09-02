@@ -7,11 +7,12 @@ import './upload.css'
 
 class Upload extends Component {
   render() {
-    const { handleUploadFile, alertNotification, progress } = this.props
+    const { onUploadFile, alertNotification, progress } = this.props
+
     return (
       <div className='upload'>
         <h1>Upload</h1>
-        <FileUploader onUploadFile={handleUploadFile} />
+        <FileUploader onUploadFile={onUploadFile} />
 
         { alertNotification !== null && <div className='upload__error'>{alertNotification}</div>}
         { alertNotification === null && progress !== null && <div className='upload__progress'>Uploading: {progress}%</div> }
@@ -28,7 +29,7 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-  handleUploadFile: pickContentFromFile
+  onUploadFile: pickContentFromFile
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Upload)

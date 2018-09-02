@@ -21,8 +21,7 @@ const pickFile = file => (dispatch, getState) => {
     return uploadFile(file, {
         onProgress: (progress) => dispatch(changeFileUploadProgress(progress))
     })
-    .then(({src}) => {
-        // do something with the `src`
+    .then(() => {
         setTimeout(() => {
             dispatch(changeFileUploadProgress(null))
         }, 1000)

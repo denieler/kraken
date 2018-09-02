@@ -85,11 +85,10 @@ class FilesController extends AbstractController
             ], 500);
         }
 
-        $fileId = $fileEntity->getId();
         return new JsonResponse(
             [
                 'data' => [ 
-                    'id' => $fileId,
+                    'id' => $fileEntity->getId(),
                     'name' => $fileEntity->getName(),
                 ]
             ]

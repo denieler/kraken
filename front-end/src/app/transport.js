@@ -13,7 +13,7 @@ export function uploadFile (file, callbacks) {
 
         const body = file
 
-        xhr.open('POST', BASE_API_URL + '/files', true)
+        xhr.open('PUT', BASE_API_URL + '/files', true)
         xhr.setRequestHeader('Content-Type', 'application/json')
 
         /* onProgress */

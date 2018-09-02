@@ -1,81 +1,78 @@
 <?php
 namespace App\Controller;
 
+use App\Constant\FileUploadConstants;
 use App\Entity\File;
+use App\Exception\WrongFileTypeException;
+use App\Exception\WrongFileSizeException;
+use App\Service\FileUploadService;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Put;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Filesystem\Filesystem;
 
 class FilesController extends AbstractController
 {
-    private const UPLOAD_DIR = '/var/tmp/kraken_files';
-    private const SUPPORTED_FILE_SIZE = 1000000;
-    private const SUPPORTED_FILE_TYPE = [
-        'image/jpeg',
-        'image/png',
-        'image/gif'
-    ];
+    private $fileUploadService;
 
-    private function isSupportedFileType(string $mimeType)
+    private function getFileExtension(string $fileName)
     {
-        return in_array($mimeType, self::SUPPORTED_FILE_TYPE);
+        $fileInfo = new \SplFileInfo($fileName);
+        return $fileInfo->getExtension();
     }
 
-    private function isSupportedFileSize(string $size)
+    private function getHashName(string $fileName)
     {
-        return $size <= self::SUPPORTED_FILE_SIZE;
+        return md5($fileName);
     }
 
-    private function getFileSize(string $fileContent) {
-        return strlen($fileContent);
+    private function generateRandomFileName(string $fileName)
+    {
+        $hash = $this->getHashName($fileName);
+        return $hash . '.' . $this->getFileExtension($fileName);
     }
 
-    private function getFileMimeType(string $fileContent)
+    public function __construct(FileUploadService $fileUploadService)
     {
-        $f = finfo_open();
-        $mime_type = finfo_buffer($f, $fileContent, FILEINFO_MIME_TYPE);
-        return $mime_type;
+        $this->fileUploadService = $fileUploadService;
     }
 
     /**
-    * @Post("/files", name="_files")
+    * @Put("/files", name="_files")
     */
     public function uploadAction(Request $request)
     {
-        $content = $request->get('content');
-        $filename = $request->get('name');
+        $fileContentBase64 = $request->get('content');
+        $fileName = $request->get('name');
 
-        $fileInfo = new \SplFileInfo($filename);
-        $hash = md5($filename);
-        $fileUploadFilename = '/' . md5($filename) . '.' . $fileInfo->getExtension();
+        $uploadingFileHash = $this->getHashName($fileName);
+        $uploadingFileName = '/' . $this->generateRandomFileName($fileName);
 
         $entityManager = $this->getDoctrine()->getManager();
         $fileRepository = $entityManager->getRepository(File::class);
 
-        $fileEntityExisting = $fileRepository->findAllByHash($hash);
-        if ($fileEntityExisting) {
-            return new JsonResponse(
-                [
+        $fileEntityExisting = $fileRepository->findAllByHash($uploadingFileHash);
+        // if we would have userId then we would need to check that there are no
+        // file with the same hash existing already for this userId
+        if ($fileEntityExisting)
+        {
+            return new JsonResponse([
                     'errors' => [
                         [
                             'code' => 'DUPLICATE_FILE',
                             'title' => 'File you trying to upload already exists on server'
                         ]
                     ]
-                ],
-                500
-            );
+            ], 500);
         }
 
         $fileEntity = new File();
-        $fileEntity->setName($filename);
-        $fileEntity->setHash($hash);
-        $fileEntity->setPath($fileUploadFilename);
+        $fileEntity->setName($fileName);
+        $fileEntity->setHash($uploadingFileHash);
+        $fileEntity->setPath($uploadingFileName);
         // if we would have userId then we would need to also connect file
         // record to the userId
 
@@ -83,38 +80,44 @@ class FilesController extends AbstractController
         $entityManager->flush();
 
         $fileId = $fileEntity->getId();
-        
+
         try {
-            $fileContent = base64_decode($content);
-
-            $mime_type = $this->getFileMimeType($fileContent);
-            $this->isSupportedFileType($mime_type);
-            $size = $this->getFileSize($fileContent);
-            $this->isSupportedFileSize($size);
-
-            file_put_contents(
-                self::UPLOAD_DIR . $fileUploadFilename,
-                $fileContent
-            );
-        } catch (\Throwable $e) {
+            $this->fileUploadService->uploadFileContent($uploadingFileName, $fileContentBase64);
+        } catch (WrongFileTypeException $e) {
+            return new JsonResponse([
+                    'errors' => [
+                        [
+                            'code' => 'SERVER_CAN_NOT_PROCESS_FILE_TYPE',
+                            'title' => 'Server can not upload this type of files'
+                        ]
+                    ]
+            ], 500);
+        } catch (WrongFileSizeException $e) {
             return new JsonResponse(
                 [
+                    'errors' => [
+                        [
+                            'code' => 'SERVER_CAN_NOT_PROCESS_FILE_SIZE',
+                            'title' => 'File size is way too big. Please upload another file'
+                        ]
+                    ]
+            ], 500);
+        } catch (\Throwable $e) {
+            return new JsonResponse([
                     'errors' => [
                         [
                             'code' => 'SERVER_CAN_NOT_PROCESS_FILE',
                             'title' => 'Server can not upload this file'
                         ]
                     ]
-                ],
-                500
-            );
+            ], 500);
         }
 
         return new JsonResponse(
             [
                 'data' => [ 
                     'id' => $fileId,
-                    'name' => $filename,
+                    'name' => $fileName,
                 ]
             ]
         );
@@ -156,8 +159,18 @@ class FilesController extends AbstractController
         $fileEntity->setDeleted(true);
         $entityManager->flush();
 
-        $fileSystem = new Filesystem();
-        $fileSystem->remove(self::UPLOAD_DIR . $fileEntity->getPath());
+        try {
+            $this->fileUploadService->removeFile($fileEntity->getPath());
+        } catch (\Throwable $e) {
+            return new JsonResponse([
+                'errors' => [
+                    [
+                        'code' => 'FILE_HAS_NOT_BEEN_REMOVED',
+                        'title' => 'File has not been removed'
+                    ]
+                ]
+            ], 500);
+        }
 
         return new JsonResponse(
             [

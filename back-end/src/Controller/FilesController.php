@@ -18,23 +18,6 @@ class FilesController extends AbstractController
 {
     private $fileUploadService;
 
-    private function getFileExtension(string $fileName)
-    {
-        $fileInfo = new \SplFileInfo($fileName);
-        return $fileInfo->getExtension();
-    }
-
-    private function getHashName(string $fileName)
-    {
-        return md5($fileName);
-    }
-
-    private function generateRandomFileName(string $fileName)
-    {
-        $hash = $this->getHashName($fileName);
-        return $hash . '.' . $this->getFileExtension($fileName);
-    }
-
     public function __construct(FileUploadService $fileUploadService)
     {
         $this->fileUploadService = $fileUploadService;
@@ -48,13 +31,12 @@ class FilesController extends AbstractController
         $fileContentBase64 = $request->get('content');
         $fileName = $request->get('name');
 
-        $uploadingFileHash = $this->getHashName($fileName);
-        $uploadingFileName = '/' . $this->generateRandomFileName($fileName);
+        $fileEntity = File::createFromUploadFile($fileName);
 
         $entityManager = $this->getDoctrine()->getManager();
         $fileRepository = $entityManager->getRepository(File::class);
 
-        $fileEntityExisting = $fileRepository->findAllByHash($uploadingFileHash);
+        $fileEntityExisting = $fileRepository->findAllByHash($fileEntity->getHash());
         // if we would have userId then we would need to check that there are no
         // file with the same hash existing already for this userId
         if ($fileEntityExisting)
@@ -69,20 +51,13 @@ class FilesController extends AbstractController
             ], 500);
         }
 
-        $fileEntity = new File();
-        $fileEntity->setName($fileName);
-        $fileEntity->setHash($uploadingFileHash);
-        $fileEntity->setPath($uploadingFileName);
-        // if we would have userId then we would need to also connect file
-        // record to the userId
-
         $entityManager->persist($fileEntity);
         $entityManager->flush();
 
         $fileId = $fileEntity->getId();
 
         try {
-            $this->fileUploadService->uploadFile($uploadingFileName, $fileContentBase64);
+            $this->fileUploadService->uploadFile($fileEntity->getPath(), $fileContentBase64);
         } catch (WrongFileTypeException $e) {
             return new JsonResponse([
                 'errors' => [
@@ -116,7 +91,7 @@ class FilesController extends AbstractController
             [
                 'data' => [ 
                     'id' => $fileId,
-                    'name' => $fileName,
+                    'name' => $fileEntity->getName(),
                 ]
             ]
         );

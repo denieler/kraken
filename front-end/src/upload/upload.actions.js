@@ -4,7 +4,12 @@ import {
 } from '../app/lib/file-validation'
 import { imageToBase64 } from '../app/lib/image-to-base64'
 import { uploadFile } from '../app/transport'
-import { SHOW_ALERT_NOTIFICATION, CHANGE_FILE_UPLOAD_PROGRESS } from './upload.reducers'
+import {
+    SHOW_ALERT_NOTIFICATION,
+    CHANGE_FILE_UPLOAD_PROGRESS,
+    FINISH_UPLOAD_PROCESS,
+    RESET_UPLOAD_PROCESS
+} from './upload.reducers'
 
 const showAlertNotification = message => ({
     type: SHOW_ALERT_NOTIFICATION,
@@ -13,6 +18,12 @@ const showAlertNotification = message => ({
 const changeFileUploadProgress = progress => ({
     type: CHANGE_FILE_UPLOAD_PROGRESS,
     payload: { progress }
+})
+const finishUploadProcess = () => ({
+    type: FINISH_UPLOAD_PROCESS
+})
+export const resetUploadProcess = () => ({
+    type: RESET_UPLOAD_PROCESS
 })
 
 const pickFile = file => (dispatch, getState) => {
@@ -24,6 +35,7 @@ const pickFile = file => (dispatch, getState) => {
     .then(() => {
         setTimeout(() => {
             dispatch(changeFileUploadProgress(null))
+            dispatch(finishUploadProcess())
         }, 1000)
     })
     .catch((err, {aborted} = {}) => {

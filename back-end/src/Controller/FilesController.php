@@ -1,42 +1,72 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\File;
 use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Post;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Finder\Finder;
 
-class FilesController
+class FilesController extends AbstractController
 {
     private const UPLOAD_DIR = '/var/tmp/kraken_files';
 
     /**
     * @Post("/files", name="_files")
     */
-    public function index(Request $request)
+    public function uploadAction(Request $request)
     {
         $file = $request->get('file');
         $filename = $request->get('name');
 
         $fileInfo = new \SplFileInfo($filename);
+        $hash = md5($filename);
+        $fileUploadFilename = '/' . md5($filename) . '.' . $fileInfo->getExtension();
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $fileEntity = new File();
+        $fileEntity->setName($filename);
+        $fileEntity->setHash($hash);
+        $fileEntity->setPath($fileUploadFilename);
+        // if we would have userId then we would need to also connect file
+        // record to the userId
+
+        $entityManager->persist($fileEntity);
+        $entityManager->flush();
+
+        $fileId = $fileEntity->getId();
         
         try {
             $fileContent = base64_decode($file);
-            $fileUploadFilename = self::UPLOAD_DIR . '/' . md5($filename) . '.' . $fileInfo->getExtension();
 
             file_put_contents(
-                $fileUploadFilename,
+                self::UPLOAD_DIR . $fileUploadFilename,
                 $fileContent
             );
         } catch (\Throwable $e) {
             return new JsonResponse(
-                [ 'error' => 'Server can not upload this file' ]
-            );    
+                [
+                    'errors' => [
+                        [
+                            'code' => 'SERVER_CAN_NOT_PROCESS_FILE',
+                            'title' => 'Server can not upload this file'
+                        ]
+                    ]
+                ],
+                500
+            );
         }
 
         return new JsonResponse(
-            [ 'isUploaded' => true ]
+            [
+                'data' => [ 
+                    'id' => $fileId,
+                    'name' => $filename,
+                ]
+            ]
         );
     }
 
@@ -45,12 +75,44 @@ class FilesController
     */
     public function listAction()
     {
-        $finder = new Finder();
-        $finder->files()->in(self::UPLOAD_DIR);
-        $content = array_map(function ($file) {
-            return $file->getBasename();
-        }, iterator_to_array($finder, false));
+        $fileRepository = $this->getDoctrine()->getRepository(File::class);
+        $files = $fileRepository->findAllNotDeleted();
 
-        return new JsonResponse([ 'files' => $content ]);
+        $result = array_map(function ($file) {
+            return [
+                'id' => $file->getId(),
+                'name' => $file->getName(),
+            ];
+        }, $files);
+
+        return new JsonResponse([ 'data' => $result ]);
+    }
+
+    /**
+    * @Delete("/files/{id}", name="_files_delete")
+    */
+    public function deleteAction(int $id)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $fileRepository = $entityManager->getRepository(File::class);
+
+        // if we would have userId then we would find file by userId and id
+        $fileEntity = $fileRepository->find($id);
+
+        if (!$fileEntity) {
+            return new JsonResponse([ 'data' => null ], 404);    
+        }
+
+        $fileEntity->setDeleted(true);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            [
+                'data' => [ 
+                    'id' => $fileEntity->getId(),
+                    'name' => $fileEntity->getName(),
+                ]
+            ]
+        );
     }
 }

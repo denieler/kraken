@@ -1,7 +1,7 @@
 import createReducer from '../app/lib/create-reducer'
 
 export const FILES_LOADING_START = 'list:FILES_LOADING_START'
-export const FILES_LOADED = 'list:FILES_LOADED'
+export const FILES_UPDATE = 'list:FILES_UPDATE'
 
 const initialState = {
     isLoading: false,
@@ -13,7 +13,7 @@ const filesLoadingStart = state => ({
     isLoading: true
 })
 
-const filesLoaded = (state, { payload: { files } }) => ({
+const filesUpdated = (state, { payload: { files } }) => ({
     ...state,
     isLoading: false,
     files
@@ -21,5 +21,5 @@ const filesLoaded = (state, { payload: { files } }) => ({
 
 export default createReducer(initialState, {
     [FILES_LOADING_START]: filesLoadingStart,
-    [FILES_LOADED]: filesLoaded
+    [FILES_UPDATE]: filesUpdated
 })

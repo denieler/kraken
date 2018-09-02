@@ -1,25 +1,25 @@
 import * as api from '../app/transport'
-import { FILES_LOADING_START, FILES_LOADED } from './list.reducers'
+import { FILES_LOADING_START, FILES_UPDATE } from './list.reducers'
 
-const startLoadingFiles = () => ({
+const filesLoadingStart = () => ({
     type: FILES_LOADING_START
 })
 
-const filesLoaded = files => ({
-    type: FILES_LOADED,
+const filesUpdate = files => ({
+    type: FILES_UPDATE,
     payload: { files }
 })
 
 export const loadFiles = () => async (dispatch) => {
-    dispatch(startLoadingFiles())
+    dispatch(filesLoadingStart())
 
     const files = await api.getFiles()
-    dispatch(filesLoaded(files))
+    dispatch(filesUpdate(files))
 }
 
 export const deleteFile = id => async (dispatch) => {
     await api.deleteFile(id)
 
     const files = await api.getFiles()
-    dispatch(filesLoaded(files))
+    dispatch(filesUpdate(files))
 }
